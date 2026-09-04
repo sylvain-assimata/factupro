@@ -38,6 +38,7 @@ class DevisSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         lignes_data = validated_data.pop('lignes')
+        validated_data.pop('entreprise', None)  # peut être injecté par TenantQuerysetMixin, on gère nous-mêmes
         request = self.context['request']
         entreprise = request.user.entreprise
         devis = Devis.objects.create(
@@ -96,6 +97,7 @@ class FactureSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         lignes_data = validated_data.pop('lignes')
+        validated_data.pop('entreprise', None)
         request = self.context['request']
         entreprise = request.user.entreprise
         facture = Facture.objects.create(
