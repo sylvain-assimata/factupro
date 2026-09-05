@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Eye, Trash2, X, ArrowRightCircle, FileSignature } from 'lucide-react';
+import { Plus, Search, Eye, Trash2, X, ArrowRightCircle, FileSignature, Download } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { getClients } from '../../api/clients';
-import { getDevis, createDevis, deleteDevis, convertirDevisEnFacture } from '../../api/facturation';
+import { getDevis, createDevis, deleteDevis, convertirDevisEnFacture, getDevisPDF } from '../../api/facturation';
+import { telechargerPdf } from '../../utils/downloadPdf';
 
 function formatMontant(n, devise = 'XOF') {
   return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(n || 0) + ' ' + devise;
@@ -102,6 +103,15 @@ export default function Devis() {
     }
   };
 
+  const handleTelechargerPdf = async (d) => {
+    try {
+      const res = await getDevisPDF(d.id);
+      telechargerPdf(res.data, d.numero);
+    } catch {
+      toast.error('Erreur lors du téléchargement du PDF');
+    }
+  };
+
   const handleDelete = async (d) => {
     if (!window.confirm(`Supprimer le devis ${d.numero} ?`)) return;
     try {
@@ -167,6 +177,10 @@ export default function Devis() {
                     <td className="px-3.5 py-2.5 text-ink-700 font-medium">{formatMontant(d.total_ttc, devise)}</td>
                     <td className="px-3.5 py-2.5">
                       <div className="flex items-center gap-1.5">
+                        <button onClick={() => handleTelechargerPdf(d)} title="Télécharger le PDF"
+                          className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-brand-50 text-brand-600">
+                          <Download size={14} strokeWidth={2} />
+                        </button>
                         {d.statut !== 'accepte' && (
                           <button onClick={() => handleConvertir(d)} title="Convertir en facture"
                             className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-green-50 text-green-600">

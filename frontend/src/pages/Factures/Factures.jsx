@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Trash2, X, ArrowRight, Receipt } from 'lucide-react';
+import { Plus, Search, Trash2, X, ArrowRight, Receipt, Download } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { getClients } from '../../api/clients';
-import { getFactures, createFacture, deleteFacture } from '../../api/facturation';
+import { getFactures, createFacture, deleteFacture, getFacturePDF } from '../../api/facturation';
+import { telechargerPdf } from '../../utils/downloadPdf';
 
 function formatMontant(n, devise = 'XOF') {
   return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(n || 0) + ' ' + devise;
@@ -172,6 +173,19 @@ export default function Factures() {
                         <button onClick={() => navigate(`/factures/${f.id}`)} title="Voir / encaisser"
                           className="h-7 px-2 rounded-md bg-brand-50 hover:bg-brand-100 text-brand-700 text-[11px] font-medium inline-flex items-center gap-1">
                           Voir <ArrowRight size={11} strokeWidth={2.5} />
+                        </button>
+                        <button
+                          onClick={async () => {
+                            try {
+                              const res = await getFacturePDF(f.id);
+                              telechargerPdf(res.data, f.numero);
+                            } catch {
+                              toast.error('Erreur lors du téléchargement du PDF');
+                            }
+                          }}
+                          title="Télécharger le PDF"
+                          className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-brand-50 text-brand-600">
+                          <Download size={14} strokeWidth={2} />
                         </button>
                         <button onClick={() => handleDelete(f)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-red-50 text-red-500">
                           <Trash2 size={13} strokeWidth={2} />

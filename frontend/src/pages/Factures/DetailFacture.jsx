@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Plus, X, Wallet, Printer } from 'lucide-react';
+import { ArrowLeft, Plus, X, Wallet, Download } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout/Layout';
 import { useAuth } from '../../context/AuthContext';
-import { getUneFacture, createPaiement } from '../../api/facturation';
+import { getUneFacture, createPaiement, getFacturePDF } from '../../api/facturation';
+import { telechargerPdf } from '../../utils/downloadPdf';
 
 function formatMontant(n, devise = 'XOF') {
   return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(n || 0) + ' ' + devise;
@@ -85,8 +86,18 @@ export default function DetailFacture() {
           <button onClick={() => navigate('/factures')} className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-800">
             <ArrowLeft size={15} /> Retour aux factures
           </button>
-          <button onClick={() => window.print()} className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-800">
-            <Printer size={15} /> Imprimer
+          <button
+            onClick={async () => {
+              try {
+                const res = await getFacturePDF(facture.id);
+                telechargerPdf(res.data, facture.numero);
+              } catch {
+                toast.error('Erreur lors du téléchargement du PDF');
+              }
+            }}
+            className="inline-flex items-center gap-1.5 text-sm text-brand-600 hover:text-brand-800 font-medium"
+          >
+            <Download size={15} /> Télécharger le PDF
           </button>
         </div>
 

@@ -2,9 +2,11 @@ from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Q
+from django.http import HttpResponse
 from config.mixins import TenantQuerysetMixin
 from .models import Devis, Facture, LigneDocument, Paiement
 from .serializers import DevisSerializer, FactureSerializer, PaiementSerializer
+from .pdf_generator import generer_pdf_devis, generer_pdf_facture
 
 
 class DevisListCreateView(TenantQuerysetMixin, generics.ListCreateAPIView):
@@ -131,3 +133,35 @@ class StatistiquesView(APIView):
             'total_encaisse': total_encaisse,
             'total_impaye': total_impaye,
         })
+
+
+# ---------- Génération PDF ----------
+
+class DevisPDFView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            devis = Devis.objects.get(pk=pk, entreprise=request.user.entreprise)
+        except Devis.DoesNotExist:
+            return Response({'detail': 'Devis introuvable.'}, status=status.HTTP_404_NOT_FOUND)
+
+        buffer = generer_pdf_devis(devis)
+        response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{devis.numero}.pdf"'
+        return response
+
+
+class FacturePDFView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            facture = Facture.objects.get(pk=pk, entreprise=request.user.entreprise)
+        except Facture.DoesNotExist:
+            return Response({'detail': 'Facture introuvable.'}, status=status.HTTP_404_NOT_FOUND)
+
+        buffer = generer_pdf_facture(facture)
+        response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{facture.numero}.pdf"'
+        return response
