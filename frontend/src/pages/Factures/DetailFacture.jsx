@@ -5,7 +5,7 @@ import { ArrowLeft, Plus, X, Wallet, Download } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout/Layout';
 import { useAuth } from '../../context/AuthContext';
-import { getUneFacture, createPaiement, getFacturePDF } from '../../api/facturation';
+import { getUneFacture, createPaiement, getFacturePDF, updateStatutFacture } from '../../api/facturation';
 import { telechargerPdf } from '../../utils/downloadPdf';
 
 function formatMontant(n, devise = 'XOF') {
@@ -73,6 +73,16 @@ export default function DetailFacture() {
     }
   };
 
+  const handleMarquerEnvoyee = async () => {
+    try {
+      await updateStatutFacture(id, 'envoyee');
+      toast.success('Facture marquée comme envoyée');
+      charger();
+    } catch {
+      toast.error('Erreur lors de la mise à jour du statut');
+    }
+  };
+
   if (loading) return (
     <Layout title="Chargement..."><div className="text-center text-ink-400 text-sm py-20">Chargement...</div></Layout>
   );
@@ -107,9 +117,19 @@ export default function DetailFacture() {
               <h2 className="text-xl font-bold text-ink-800 font-display page-title inline-block">{facture.numero}</h2>
               <p className="text-sm text-ink-500 mt-2">{facture.client_nom}</p>
             </div>
-            <span className={`text-xs px-3 py-1 rounded-full font-medium ${STATUT_COLORS[facture.statut]}`}>
-              {STATUT_LABELS[facture.statut]}
-            </span>
+            <div className="flex items-center gap-2">
+              {facture.statut === 'brouillon' && (
+                <button
+                  onClick={handleMarquerEnvoyee}
+                  className="text-xs px-3 py-1 rounded-full font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+                >
+                  Marquer comme envoyée
+                </button>
+              )}
+              <span className={`text-xs px-3 py-1 rounded-full font-medium ${STATUT_COLORS[facture.statut]}`}>
+                {STATUT_LABELS[facture.statut]}
+              </span>
+            </div>
           </div>
 
           <table className="w-full text-sm mb-4">

@@ -14,6 +14,7 @@ export const getFactures = (params = {}) => api.get('/factures/', { params });
 export const getUneFacture = (id) => api.get(`/factures/${id}/`);
 export const createFacture = (payload) => api.post('/factures/', payload);
 export const updateFacture = (id, payload) => api.put(`/factures/${id}/`, payload);
+export const updateStatutFacture = (id, statut) => api.patch(`/factures/${id}/`, { statut });
 export const deleteFacture = (id) => api.delete(`/factures/${id}/`);
 export const getFacturePDF = (id) => api.get(`/factures/${id}/pdf/`, { responseType: 'blob' });
 

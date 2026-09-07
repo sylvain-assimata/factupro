@@ -124,11 +124,17 @@ class StatistiquesView(APIView):
         total_encaisse = sum((f.total_paye for f in factures), 0)
         total_impaye = total_facture - total_encaisse
 
+        # Une facture est "impayée" si elle a un solde restant dû et n'est pas annulée
+        # (se base sur le solde réel plutôt que sur le champ statut, plus fiable).
+        nb_factures_impayees = sum(
+            1 for f in factures if f.statut != 'annulee' and f.solde_restant > 0
+        )
+
         return Response({
             'nb_clients': clients_count,
             'nb_devis': devis.count(),
             'nb_factures': factures.count(),
-            'nb_factures_impayees': factures.filter(statut__in=['envoyee', 'partielle', 'retard']).count(),
+            'nb_factures_impayees': nb_factures_impayees,
             'total_facture': total_facture,
             'total_encaisse': total_encaisse,
             'total_impaye': total_impaye,
