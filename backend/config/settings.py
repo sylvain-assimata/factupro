@@ -135,3 +135,8 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'True') == 'True'
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# FedaPay (paiement Mobile Money / carte pour les abonnements)
+FEDAPAY_SECRET_KEY = os.environ.get('FEDAPAY_SECRET_KEY', '')
+FEDAPAY_ENVIRONMENT = os.environ.get('FEDAPAY_ENVIRONMENT', 'sandbox')  # 'sandbox' ou 'live'
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')

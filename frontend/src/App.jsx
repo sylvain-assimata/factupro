@@ -14,6 +14,8 @@ import Factures from './pages/Factures/Factures';
 import DetailFacture from './pages/Factures/DetailFacture';
 import Equipe from './pages/Equipe/Equipe';
 import Parametres from './pages/Parametres/Parametres';
+import Abonnement from './pages/Abonnement/Abonnement';
+import RetourAbonnement from './pages/Abonnement/RetourAbonnement';
 
 function App() {
   return (
@@ -43,6 +45,12 @@ function App() {
           } />
           <Route path="/parametres" element={
             <ProtectedRoute><Parametres /></ProtectedRoute>
+          } />
+          <Route path="/abonnement" element={
+            <ProtectedRoute><Abonnement /></ProtectedRoute>
+          } />
+          <Route path="/abonnement/retour" element={
+            <ProtectedRoute><RetourAbonnement /></ProtectedRoute>
           } />
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

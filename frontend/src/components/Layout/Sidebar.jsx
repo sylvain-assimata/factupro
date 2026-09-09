@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  LayoutDashboard, Users, FileSignature, Receipt, Settings, UsersRound, LogOut,
+  LayoutDashboard, Users, FileSignature, Receipt, Settings, UsersRound, LogOut, CreditCard,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -12,6 +12,7 @@ const menuItems = [
   { path: '/factures',     label: 'Factures',        icon: Receipt },
   { path: '/equipe',       label: 'Équipe',          icon: UsersRound, roles: ['proprietaire', 'comptable'] },
   { path: '/parametres',   label: 'Paramètres',      icon: Settings },
+  { path: '/abonnement',   label: 'Abonnement',      icon: CreditCard },
 ];
 
 export default function Sidebar() {

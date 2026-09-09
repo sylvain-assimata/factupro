@@ -7,3 +7,8 @@ export const getEquipe = () => api.get('/utilisateurs/');
 export const inviterMembre = (payload) => api.post('/utilisateurs/', payload);
 export const updateMembre = (id, payload) => api.patch(`/utilisateurs/${id}/`, payload);
 export const deleteMembre = (id) => api.delete(`/utilisateurs/${id}/`);
+
+// Abonnement (paiement Mobile Money via FedaPay)
+export const getPlans = () => api.get('/entreprise/abonnement/plans/');
+export const initierAbonnement = (plan) => api.post('/entreprise/abonnement/initier/', { plan });
+export const verifierAbonnement = (id) => api.get(`/entreprise/abonnement/${id}/verifier/`);
