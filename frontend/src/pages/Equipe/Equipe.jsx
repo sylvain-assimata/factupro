@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Trash2, UsersRound } from 'lucide-react';
+import { Plus, X, Trash2, UsersRound, Pencil } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout/Layout';
 import { useAuth } from '../../context/AuthContext';
-import { getEquipe, inviterMembre, deleteMembre } from '../../api/entreprise';
+import { getEquipe, inviterMembre, updateMembre, deleteMembre } from '../../api/entreprise';
 
 const ROLE_LABELS = { proprietaire: 'Propriétaire', comptable: 'Comptable', membre: 'Membre' };
 const ROLE_COLORS = {
@@ -13,7 +13,7 @@ const ROLE_COLORS = {
   membre: 'bg-ink-100 text-ink-600',
 };
 
-const FORM_VIDE = { prenom: '', nom: '', email: '', password: '', role: 'membre' };
+const FORM_VIDE = { prenom: '', nom: '', email: '', password: '', role: 'membre', poste: '' };
 
 export default function Equipe() {
   const { utilisateur } = useAuth();
@@ -22,6 +22,8 @@ export default function Equipe() {
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(FORM_VIDE);
+  const [editPosteId, setEditPosteId] = useState(null);
+  const [editPosteValeur, setEditPosteValeur] = useState('');
 
   const charger = async () => {
     setLoading(true);
@@ -73,6 +75,17 @@ export default function Equipe() {
     }
   };
 
+  const handleEnregistrerPoste = async (membreId) => {
+    try {
+      await updateMembre(membreId, { poste: editPosteValeur });
+      toast.success('Poste mis à jour');
+      setEditPosteId(null);
+      charger();
+    } catch {
+      toast.error('Erreur lors de la mise à jour du poste');
+    }
+  };
+
   return (
     <Layout title="Équipe" subtitle="Gérez les accès de votre entreprise">
       <div className="max-w-3xl mx-auto flex flex-col gap-4">
@@ -94,6 +107,7 @@ export default function Equipe() {
                 <tr>
                   <th className="elegant-th">Nom</th>
                   <th className="elegant-th">Email</th>
+                  <th className="elegant-th">Poste</th>
                   <th className="elegant-th">Rôle</th>
                   <th className="elegant-th">Actions</th>
                 </tr>
@@ -103,6 +117,29 @@ export default function Equipe() {
                   <tr key={m.id} className="elegant-row border-b border-ink-100 last:border-0">
                     <td className="px-3.5 py-2.5 font-medium text-ink-800">{m.prenom} {m.nom}</td>
                     <td className="px-3.5 py-2.5 text-ink-500">{m.email}</td>
+                    <td className="px-3.5 py-2.5 text-ink-600">
+                      {editPosteId === m.id ? (
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            autoFocus
+                            value={editPosteValeur}
+                            onChange={(e) => setEditPosteValeur(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleEnregistrerPoste(m.id); if (e.key === 'Escape') setEditPosteId(null); }}
+                            placeholder="ex: Commercial"
+                            className="h-7 w-32 border border-brand-300 rounded px-2 text-xs outline-none focus:ring-1 focus:ring-brand-200"
+                          />
+                          <button onClick={() => handleEnregistrerPoste(m.id)} className="text-[10px] text-brand-600 font-medium">OK</button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => { setEditPosteId(m.id); setEditPosteValeur(m.poste || ''); }}
+                          className="inline-flex items-center gap-1 text-xs hover:text-brand-600 group"
+                        >
+                          {m.poste || <span className="text-ink-300 italic">Ajouter un poste</span>}
+                          <Pencil size={11} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                      )}
+                    </td>
                     <td className="px-3.5 py-2.5">
                       <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${ROLE_COLORS[m.role]}`}>
                         {ROLE_LABELS[m.role]}
@@ -163,6 +200,12 @@ export default function Equipe() {
                   <label className="text-[10px] font-medium text-ink-500 uppercase tracking-wide">Mot de passe temporaire</label>
                   <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
                     placeholder="6 caractères min."
+                    className="h-9 border border-ink-200 rounded-md px-3 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-100" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-medium text-ink-500 uppercase tracking-wide">Poste (optionnel)</label>
+                  <input value={form.poste} onChange={(e) => setForm({ ...form, poste: e.target.value })}
+                    placeholder="ex: Commercial, Assistante comptable..."
                     className="h-9 border border-ink-200 rounded-md px-3 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-100" />
                 </div>
                 <div className="flex flex-col gap-1">

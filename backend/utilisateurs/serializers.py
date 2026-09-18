@@ -12,7 +12,7 @@ from entreprises.serializers import EntrepriseSerializer
 class UtilisateurSerializer(serializers.ModelSerializer):
     class Meta:
         model = Utilisateur
-        fields = ['id', 'email', 'prenom', 'nom', 'role', 'telephone', 'actif', 'date_creation']
+        fields = ['id', 'email', 'prenom', 'nom', 'role', 'poste', 'telephone', 'actif', 'date_creation']
         read_only_fields = ['id', 'date_creation']
 
 
@@ -74,6 +74,7 @@ class InviterUtilisateurSerializer(serializers.Serializer):
     nom = serializers.CharField(max_length=100)
     password = serializers.CharField(min_length=6, write_only=True)
     role = serializers.ChoiceField(choices=Utilisateur.ROLE_CHOICES, default='membre')
+    poste = serializers.CharField(max_length=100, required=False, allow_blank=True, default='')
 
     def validate_email(self, value):
         if Utilisateur.objects.filter(email__iexact=value).exists():
@@ -88,5 +89,6 @@ class InviterUtilisateurSerializer(serializers.Serializer):
             prenom=validated_data['prenom'],
             nom=validated_data['nom'],
             role=validated_data['role'],
+            poste=validated_data.get('poste', ''),
             entreprise=entreprise,
         )

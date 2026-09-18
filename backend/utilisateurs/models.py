@@ -35,6 +35,7 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
     prenom = models.CharField(max_length=100)
     nom = models.CharField(max_length=100)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='membre')
+    poste = models.CharField(max_length=100, blank=True, help_text="Intitulé du poste (ex: Commercial, Comptable senior...)")
     telephone = models.CharField(max_length=30, blank=True)
     actif = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
