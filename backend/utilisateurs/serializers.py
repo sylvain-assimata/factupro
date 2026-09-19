@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.text import slugify
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
 from django.db import transaction
 from datetime import date, timedelta
 
@@ -92,3 +94,34 @@ class InviterUtilisateurSerializer(serializers.Serializer):
             poste=validated_data.get('poste', ''),
             entreprise=entreprise,
         )
+
+
+class DemandeReinitialisationSerializer(serializers.Serializer):
+    """Étape 1 : l'utilisateur saisit son email pour recevoir un lien."""
+    email = serializers.EmailField()
+
+
+class ConfirmerReinitialisationSerializer(serializers.Serializer):
+    """Étape 2 : l'utilisateur clique sur le lien reçu et choisit un nouveau mot de passe."""
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    password = serializers.CharField(min_length=6)
+
+    def validate(self, attrs):
+        try:
+            uid = urlsafe_base64_decode(attrs['uid']).decode()
+            utilisateur = Utilisateur.objects.get(pk=uid)
+        except (ValueError, TypeError, OverflowError, Utilisateur.DoesNotExist):
+            raise serializers.ValidationError("Lien de réinitialisation invalide.")
+
+        if not default_token_generator.check_token(utilisateur, attrs['token']):
+            raise serializers.ValidationError("Ce lien a expiré ou a déjà été utilisé. Merci d'en redemander un nouveau.")
+
+        attrs['utilisateur'] = utilisateur
+        return attrs
+
+    def save(self):
+        utilisateur = self.validated_data['utilisateur']
+        utilisateur.set_password(self.validated_data['password'])
+        utilisateur.save()
+        return utilisateur

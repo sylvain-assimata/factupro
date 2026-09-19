@@ -87,9 +87,14 @@ export default function Login() {
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-medium text-ink-500 uppercase tracking-wide">
-                Mot de passe
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] font-medium text-ink-500 uppercase tracking-wide">
+                  Mot de passe
+                </label>
+                <Link to="/mot-de-passe-oublie" className="text-[11px] text-brand-600 hover:underline">
+                  Mot de passe oublié ?
+                </Link>
+              </div>
               <div className="relative">
                 <input
                   type={showPwd ? 'text' : 'password'}

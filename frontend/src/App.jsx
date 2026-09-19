@@ -6,6 +6,8 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Login from './pages/Login/Login';
+import MotDePasseOublie from './pages/MotDePasseOublie/MotDePasseOublie';
+import ReinitialiserMotDePasse from './pages/ReinitialiserMotDePasse/ReinitialiserMotDePasse';
 import Inscription from './pages/Inscription/Inscription';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Clients from './pages/Clients/Clients';
@@ -23,6 +25,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
+          <Route path="/reinitialiser-mot-de-passe" element={<ReinitialiserMotDePasse />} />
           <Route path="/inscription" element={<Inscription />} />
 
           <Route path="/dashboard" element={

@@ -140,3 +140,16 @@ if not DEBUG:
 FEDAPAY_SECRET_KEY = os.environ.get('FEDAPAY_SECRET_KEY', '')
 FEDAPAY_ENVIRONMENT = os.environ.get('FEDAPAY_ENVIRONMENT', 'sandbox')  # 'sandbox' ou 'live'
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+
+# Envoi d'emails (mot de passe oublié, etc.)
+# En local (DEBUG=True) sans config SMTP : les emails s'affichent juste dans la console.
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+if EMAIL_HOST:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'FactuPro <noreply@factupro.app>')
